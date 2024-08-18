@@ -164,7 +164,7 @@
             <br>
             <button onclick="startQuiz()">クイズを開始</button>
             <button onclick="showStudyResults()">学習結果</button>
-            <button onclick="exportStudyLog()">学習ログを出力</button>
+            <button onclick="prepareExportStudyLog()">学習ログを出力</button>
             <a id="downloadLink" style="display:none;">学習ログをダウンロード</a>
             <button onclick="document.getElementById('logFile').click()">学習ログを読み込む</button>
             <input type="file" id="logFile" accept=".json" style="display: none;" onchange="importStudyLog()">
@@ -204,6 +204,20 @@
             </table>
             <button onclick="returnToStart()">最初の画面に戻る</button>
         </div>
+
+        <!-- ファイル名入力ダイアログ -->
+        <div id="saveDialog" style="display: none;">
+            <label for="newFileName">新規ファイル名（拡張子なし）:</label>
+            <input type="text" id="newFileName" placeholder="study_log">
+            <br>
+            <button onclick="exportStudyLog('new')">新規ファイルを作成</button>
+            <br>
+            <label for="overwriteFile">上書き保存するファイルを選択:</label>
+            <input type="file" id="overwriteFile" accept=".json">
+            <br>
+            <button onclick="exportStudyLog('overwrite')">上書き保存</button>
+        </div>
+
     </div>
 
     <script>
@@ -502,14 +516,35 @@
             }
         }
 
-        function exportStudyLog() {
-            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(studyLog));
-            const downloadAnchorNode = document.getElementById('downloadLink');
-            downloadAnchorNode.setAttribute("href", dataStr);
-            downloadAnchorNode.setAttribute("download", "study_log.json");
+        function prepareExportStudyLog() {
+            document.getElementById('saveDialog').style.display = 'block';
+        }
+
+        function exportStudyLog(mode) {
+            let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(studyLog));
+            let downloadAnchorNode = document.getElementById('downloadLink');
+
+            if (mode === 'new') {
+                const newFileName = document.getElementById('newFileName').value || 'study_log';
+                downloadAnchorNode.setAttribute("href", dataStr);
+                downloadAnchorNode.setAttribute("download", newFileName + ".json");
+            } else if (mode === 'overwrite') {
+                const fileInput = document.getElementById('overwriteFile');
+                if (fileInput.files.length === 0) {
+                    showMessage('上書きするファイルを選択してください。', 'error');
+                    return;
+                }
+                const existingFileName = fileInput.files[0].name;
+                downloadAnchorNode.setAttribute("href", dataStr);
+                downloadAnchorNode.setAttribute("download", existingFileName);
+            }
+
             downloadAnchorNode.style.display = 'block';
             downloadAnchorNode.click();
             downloadAnchorNode.style.display = 'none';
+
+            // 保存ダイアログを非表示に
+            document.getElementById('saveDialog').style.display = 'none';
         }
 
         function importStudyLog() {
