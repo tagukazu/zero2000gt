@@ -6,13 +6,17 @@
     <title>クイズ宅建くん</title>
     <style>
         body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
             font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px 5px;
+            line-height: 1.6;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            flex-direction: column;
+            box-sizing: border-box;
+            min-height: 100vh;
         }
 
         #container {
@@ -20,9 +24,6 @@
             width: 100%;
             padding: 20px;
             box-sizing: border-box;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -31,7 +32,7 @@
         h1 {
             text-align: center;
             width: 100%;
-            margin: 0 auto 20px auto;
+            margin: 0 auto;
         }
 
         #start, #quiz, #studyResults {
@@ -42,31 +43,37 @@
             align-items: center;
         }
 
-        button, input[type="text"], input[type="file"], input[type="checkbox"] {
+        button {
             margin: 10px 0;
             padding: 10px 20px;
             font-size: 16px;
             cursor: pointer;
-            text-align: center;
-            max-width: 400px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        button {
             background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 5px;
+            width: 100%;
+            max-width: 400px;
+            box-sizing: border-box;
+            text-align: center;
         }
 
         .stop-button {
             background-color: #f44336;
-            margin-top: 20px;
         }
 
         .selected-answer {
             background-color: #2E7D32 !important;
+        }
+
+        input[type="text"], input[type="file"], input[type="checkbox"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            box-sizing: border-box;
+            max-width: 400px;
+            font-size: 16px;
+            text-align: center;
         }
 
         .content-box {
@@ -121,13 +128,49 @@
         }
 
         @media screen and (max-width: 768px) {
-            button, input[type="text"], input[type="file"], input[type="checkbox"] {
-                font-size: 14px;
-                padding: 8px 16px;
+            body {
+                min-width: 400px;
             }
 
-            #container {
+            button {
+                font-size: 14px;
+                padding: 8px 16px;
+                max-width: 100%;
+            }
+
+            input[type="text"], input[type="file"] {
+                padding: 8px;
+                font-size: 16px;
+                max-width: 100%;
+            }
+
+            .answer-button {
+                font-size: 16px;
+                padding: 8px 16px;
+                max-width: calc(50% - 10px);
+            }
+
+            h1, h2, h3 {
+                font-size: 18px;
+            }
+
+            .content-box {
                 padding: 10px;
+                max-width: 100%;
+            }
+        }
+
+        @media screen and (min-width: 769px) and (max-width: 1024px) {
+            body {
+                min-width: 768px;
+            }
+
+            .answer-buttons {
+                justify-content: center;
+            }
+
+            .answer-button {
+                max-width: 100%;
             }
         }
 
@@ -393,9 +436,7 @@
 
         function stopQuiz() {
             if (confirm('クイズを中止してもよろしいですか？')) {
-                document.getElementById('quiz').style.display = 'none';
-                document.getElementById('start').style.display = 'block';
-                showMessage('クイズが中止されました。', 'success');
+                showResult();
             }
         }
 
