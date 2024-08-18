@@ -83,6 +83,11 @@
         .answer-button {
             flex: 1;
             max-width: calc(50% - 10px);
+            background-color: gray; /* 通常時のボタンの色を灰色に設定 */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
 
         button {
@@ -145,14 +150,13 @@
         }
 
         .selected-answer {
-            background-color: #00008B; /* 濃い青色 */
             color: white;
         }
 
         #judgement {
             text-align: center;
             font-weight: bold;
-            font-size: 18px; /* お好みでサイズ調整 */
+            font-size: 18px;
             margin: 20px 0;
         }
 
@@ -389,27 +393,28 @@
 
             const question = quizData[currentQuestionIndex];
             const isCorrect = answer === question['正解'];
+
+            // 正解の場合、ボタンを青色に変更
             if (isCorrect) {
                 correctAnswers++;
                 studyLog[question['問題番号']].correct++;
+                buttonElement.style.backgroundColor = 'blue';  // ボタンを青色に変更
                 document.getElementById('judgement').style.color = 'blue';  // 正解の場合、青色に変更
                 document.getElementById('judgement').textContent = '正解です！';
             } else {
+                // 不正解の場合、ボタンを赤色に変更
                 if (!isReviewMode) {
                     incorrectQuestions.push(question);
-                    document.getElementById('judgement').style.color = 'red';  // 不正解の場合、赤色に変更
-                    document.getElementById('judgement').textContent = '不正解です。';
                 }
                 studyLog[question['問題番号']].incorrect++;
+                buttonElement.style.backgroundColor = 'red';  // ボタンを赤色に変更
+                document.getElementById('judgement').style.color = 'red';  // 不正解の場合、赤色に変更
+                document.getElementById('judgement').textContent = '不正解です。';
             }
 
             hasAnswered = true;
             toggleAnswerButtons(false);
 
-            // 選択したボタンに青色のクラスを適用
-            buttonElement.classList.add('selected-answer');
-
-            document.getElementById('judgement').textContent = isCorrect ? '正解です！' : '不正解です。';
             document.getElementById('explanationText').textContent = question['解答'];
         }
 
@@ -421,14 +426,18 @@
         function nextQuestion() {
             currentQuestionIndex++;
             if (currentQuestionIndex < quizData.length) {
+                resetButtonStyles(); // ボタンの色を灰色にリセット
                 showQuestion();
-                resetButtonStyles();
             } else {
                 showResult();
             }
         }
 
         function resetButtonStyles() {
+            const buttons = document.querySelectorAll('.answer-button');
+            buttons.forEach(button => {
+                button.style.backgroundColor = 'gray'; // ボタンの色を灰色にリセット
+            });
             document.getElementById('button1').classList.remove('selected-answer');
             document.getElementById('button2').classList.remove('selected-answer');
         }
