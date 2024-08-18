@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>クイズ宅建くん</title>
     <style>
         body {
@@ -199,7 +199,7 @@
         let incorrectQuestions = [];
         let isReviewMode = false;
         let studyLog = {};
-        let hasAnswered = false;  // 解答済みかどうかを追跡するためのフラグ
+        let hasAnswered = false;
 
         document.addEventListener('keydown', function(event) {
             if (!hasAnswered) {
@@ -332,12 +332,12 @@
             document.getElementById('questionContainer').textContent = question['問題'];
             document.getElementById('judgement').textContent = '';
             document.getElementById('explanationText').textContent = '';
-            hasAnswered = false;  // 問題が表示されたら回答可能にする
-            toggleAnswerButtons(true);  // ボタンを有効化
+            hasAnswered = false;
+            toggleAnswerButtons(true);
         }
 
         function submitAnswer(answer, buttonElement) {
-            if (hasAnswered) return;  // すでに解答済みなら何もしない
+            if (hasAnswered) return;
 
             const question = quizData[currentQuestionIndex];
             const isCorrect = answer === question['正解'];
@@ -351,9 +351,9 @@
                 studyLog[question['問題番号']].incorrect++;
             }
 
-            hasAnswered = true;  // 解答済みフラグを立てる
-            toggleAnswerButtons(false);  // ボタンを無効化
-            buttonElement.classList.add('selected-answer');  // 選択したボタンを濃い緑色に変更
+            hasAnswered = true;
+            toggleAnswerButtons(false);
+            buttonElement.classList.add('selected-answer');
 
             document.getElementById('judgement').textContent = isCorrect ? '正解です！' : '不正解です。';
             document.getElementById('explanationText').textContent = question['解答'];
@@ -368,7 +368,7 @@
             currentQuestionIndex++;
             if (currentQuestionIndex < quizData.length) {
                 showQuestion();
-                resetButtonStyles();  // ボタンのスタイルをリセット
+                resetButtonStyles();
             } else {
                 showResult();
             }
@@ -452,7 +452,6 @@
             for (const [questionNumber, log] of Object.entries(studyLog)) {
                 const total = log.correct + log.incorrect;
 
-                // 無効なデータをスキップするためのチェック
                 if (!questionNumber || isNaN(total)) continue;
 
                 const row = tableBody.insertRow();
