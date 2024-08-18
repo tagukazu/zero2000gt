@@ -131,8 +131,36 @@
         }
 
         /* スマホモードの設定 */
-        .mobile-mode {
+        body.mobile-mode {
             max-width: 414px; /* iPhone 11の幅に固定 */
+            padding: 10px;
+        }
+
+        body.mobile-mode button {
+            font-size: 14px;
+            padding: 8px 16px;
+        }
+
+        body.mobile-mode input[type="text"],
+        body.mobile-mode input[type="file"] {
+            padding: 8px;
+            font-size: 14px;
+        }
+
+        body.mobile-mode .answer-button {
+            font-size: 16px;
+            padding: 8px 16px;
+            max-width: 100%;
+        }
+
+        body.mobile-mode h1, 
+        body.mobile-mode h2, 
+        body.mobile-mode h3 {
+            font-size: 18px;
+        }
+
+        body.mobile-mode .content-box {
+            padding: 10px;
         }
     </style>
 </head>
@@ -526,7 +554,7 @@
                 document.querySelector('meta[name="viewport"]').setAttribute('content', 'width=414, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
             } else {
                 document.body.classList.remove('mobile-mode');
-                document.querySelector('meta[name="viewport"]').setAttribute('content', 'width=device-width, initial-scale=1.0');
+                document.querySelector('meta[name="viewport"]').setAttribute('content', 'width=device-width, initial-scale=1.0, user-scalable=yes');
             }
         }
     </script>
