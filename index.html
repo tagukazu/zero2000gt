@@ -386,6 +386,10 @@
             document.getElementById('explanationText').textContent = '';
             hasAnswered = false;
             toggleAnswerButtons(true);
+
+            // ボタンの色を灰色にリセット
+            resetButtonStyles();
+
         }
 
         function submitAnswer(answer, buttonElement) {
