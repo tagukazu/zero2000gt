@@ -7,11 +7,12 @@
     <style>
         body {
             display: flex;
-            justify-content: center; /* 横方向の中央配置 */
-            align-items: center; /* 縦方向の中央配置 */
-            min-height: 100vh; /* 画面の高さを占める */
-            margin: 0; /* 余白をなくす */
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
             font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
         }
 
         #container {
@@ -19,6 +20,9 @@
             width: 100%;
             padding: 20px;
             box-sizing: border-box;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -27,7 +31,7 @@
         h1 {
             text-align: center;
             width: 100%;
-            margin: 0 auto;
+            margin: 0 auto 20px auto;
         }
 
         #start, #quiz, #studyResults {
@@ -58,6 +62,7 @@
 
         .stop-button {
             background-color: #f44336;
+            margin-top: 20px;
         }
 
         .selected-answer {
@@ -388,7 +393,9 @@
 
         function stopQuiz() {
             if (confirm('クイズを中止してもよろしいですか？')) {
-                showResult();
+                document.getElementById('quiz').style.display = 'none';
+                document.getElementById('start').style.display = 'block';
+                showMessage('クイズが中止されました。', 'success');
             }
         }
 
