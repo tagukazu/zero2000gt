@@ -12,7 +12,9 @@
             line-height: 1.6;
             overflow-x: hidden;
             display: flex;
-            justify-content: center; /* 横方向のセンタリング */
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
             box-sizing: border-box;
             min-height: 100vh;
         }
@@ -70,7 +72,7 @@
             margin: 10px 0;
             box-sizing: border-box;
             max-width: 400px;
-            font-size: 16px; /* 拡大防止のためにfont-sizeを16pxに設定 */
+            font-size: 16px;
             text-align: center;
         }
 
@@ -83,7 +85,7 @@
             box-sizing: border-box;
             width: 100%;
             max-width: 600px;
-            margin: 0 auto; /* 中央寄せ */
+            margin: 0 auto;
         }
 
         .answer-buttons {
@@ -125,20 +127,21 @@
             background-color: #f2f2f2;
         }
 
-        @media screen and (max-width: 600px) {
+        @media screen and (max-width: 768px) {
             body {
                 min-width: 400px;
             }
+
             button {
                 font-size: 14px;
                 padding: 8px 16px;
-                max-width: 400px;
+                max-width: 100%;
             }
 
             input[type="text"], input[type="file"] {
                 padding: 8px;
                 font-size: 16px;
-                max-width: 400px;
+                max-width: 100%;
             }
 
             .answer-button {
@@ -153,7 +156,7 @@
 
             .content-box {
                 padding: 10px;
-                max-width: 400px;
+                max-width: 100%;
             }
         }
     </style>
