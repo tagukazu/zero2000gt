@@ -283,7 +283,7 @@
                     const csv = e.target.result;
                     try {
                         originalQuizData = parseCSV(csv);
-                        showMessage('CSVファイルが正常に読み込まれました。問題範囲を入力してクイズを開始してください。', 'success');
+                        showMessage('CSVファイルが正常に読み込まれました。<br>問題範囲を入力してクイズを開始してください。', 'success');
                         initializeStudyLog();
                     } catch (error) {
                         showMessage('CSVファイルの解析に失敗しました: ' + error.message, 'error');
@@ -334,7 +334,7 @@
 
         function showMessage(message, type) {
             const messageElement = document.getElementById('message');
-            messageElement.textContent = message;
+            messageElement.innerHTML = message;
             messageElement.className = type;
         }
 
