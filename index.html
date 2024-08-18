@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>クイズ宅建くん</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            overflow-x: hidden;
+            max-width: 800px;
+            width: 100%;
+        }
+
+        #start, #quiz, #studyResults {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        button {
+            margin: 10px 0;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .stop-button {
+            background-color: #f44336;
+        }
+
+        .selected-answer {
+            background-color: #2E7D32 !important; /* 濃い緑 */
+        }
+
+        input[type="text"], input[type="file"], input[type="checkbox"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+
+        .content-box {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        .answer-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .answer-button {
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            flex-grow: 1;
+            max-width: calc(50% - 20px);
+            box-sizing: border-box;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            box-sizing: border-box;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+            box-sizing: border-box;
+            word-wrap: break-word;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        @media screen and (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            button {
+                font-size: 14px;
+                padding: 8px 16px;
+            }
+
+            input[type="text"], input[type="file"] {
+                padding: 8px;
+                font-size: 14px;
+            }
+
+            .answer-button {
+                font-size: 16px;
+                padding: 8px 16px;
+                max-width: 100%;
+            }
+
+            h1, h2, h3 {
+                font-size: 18px;
+            }
+
+            .content-box {
+                padding: 10px;
+            }
+        }
+
+        /* 全体の横幅調整 */
+        #quiz, #studyResults {
+            padding: 10px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* スマホモードの設定 */
+        .mobile-mode {
+            max-width: 414px; /* iPhone 11の幅に固定 */
+        }
+    </style>
+</head>
+<body>
+    <h1>クイズ宅建くん</h1>
+    <div id="start">
+        <button onclick="document.getElementById('csvFile').click()">ファイルの選択</button>
+        <input type="file" id="csvFile" accept=".csv" style="display: none;" onchange="updateFileName()">
+        <button onclick="loadCSV()">CSVファイルを読み込む</button>
+        <div id="message"></div>
+        <br>
+        <label for="range">問題範囲（例: 1-11）: </label>
+        <input type="text" id="range" placeholder="1-11">
+        <br>
+        <label><input type="checkbox" id="mobileModeToggle" onchange="toggleMobileMode()"> スマホモードに切り替える</label>
+        <button onclick="startQuiz()">クイズを開始</button>
+        <button onclick="showStudyResults()">学習結果</button>
+        <button onclick="exportStudyLog()">学習ログを出力</button>
+        <a id="downloadLink" style="display:none;">学習ログをダウンロード</a>
+        <button onclick="document.getElementById('logFile').click()">学習ログを読み込む</button>
+        <input type="file" id="logFile" accept=".json" style="display: none;" onchange="importStudyLog()">
+        <button onclick="startReviewMode()">復習モードを開始</button>
+        <button onclick="startReviewLowAccuracy()">正解率が低い問題を復習</button>
+        <button onclick="refreshApp()">リフレッシュ</button>
+    </div>
+
+    <div id="quiz" style="display:none;">
+        <h2>問題 <span id="questionNumber"></span></h2>
+        <div id="questionContainer" class="content-box"></div>
+        <div class="answer-buttons">
+            <button class="answer-button" id="button1" onclick="submitAnswer('〇', this)">○</button>
+            <button class="answer-button" id="button2" onclick="submitAnswer('×', this)">×</button>
+        </div>
+        <div id="judgement"></div>
+        <h3>解説</h3>
+        <div id="explanationText" class="content-box"></div>
+        <button id="nextButton" onclick="nextQuestion()">次の問題へ</button>
+        <button class="stop-button" onclick="stopQuiz()">クイズを中止</button>
+    </div>
+
+    <div id="studyResults" style="display:none;">
+        <button onclick="returnToStart()">最初の画面に戻る</button>
+        <h2>学習結果</h2>
+        <table id="resultsTable">
+            <thead>
+                <tr>
+                    <th>問題番号</th>
+                    <th>解答数</th>
+                    <th>正解数</th>
+                    <th>不正解数</th>
+                    <th>正解率</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <button onclick="returnToStart()">最初の画面に戻る</button>
+    </div>
+
+    <script>
+        let originalQuizData = [];
+        let quizData = [];
+        let currentQuestionIndex = 0;
+        let correctAnswers = 0;
+        let incorrectQuestions = [];
+        let isReviewMode = false;
+        let studyLog = {};
+        let hasAnswered = false;  // 解答済みかどうかを追跡するためのフラグ
+
+        document.addEventListener('keydown', function(event) {
+            if (!hasAnswered) {
+                if (event.key === '1') {
+                    submitAnswer('〇', document.getElementById('button1'));
+                } else if (event.key === '2') {
+                    submitAnswer('×', document.getElementById('button2'));
+                }
+            }
+
+            if (event.key === '3') {
+                nextQuestion();
+            }
+        });
+
+        function updateFileName() {
+            const fileInput = document.getElementById('csvFile');
+            const fileName = fileInput.files[0] ? fileInput.files[0].name : 'ファイルが選択されていません';
+            document.querySelector('button').textContent = fileName;
+        }
+
+        function loadCSV() {
+            const fileInput = document.getElementById('csvFile');
+            const file = fileInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const csv = e.target.result;
+                    try {
+                        originalQuizData = parseCSV(csv);
+                        showMessage('CSVファイルが正常に読み込まれました。問題範囲を入力してクイズを開始してください。', 'success');
+                        initializeStudyLog();
+                    } catch (error) {
+                        showMessage('CSVファイルの解析に失敗しました: ' + error.message, 'error');
+                    }
+                };
+                reader.onerror = function(e) {
+                    showMessage('ファイルの読み込みに失敗しました。', 'error');
+                };
+                reader.readAsText(file);
+            } else {
+                showMessage('ファイルを選択してください。', 'error');
+            }
+        }
+
+        function parseCSV(csv) {
+            const lines = csv.split(/\r\n|\n/).map(line => line.trim()).filter(line => line);
+            if (lines.length < 2) {
+                throw new Error('CSVファイルは少なくとも2行（ヘッダーと1つのデータ行）が必要です。');
+            }
+            const headers = lines[0].split(',').map(header => header.trim());
+            return lines.slice(1).map(line => {
+                const values = csvLineSplit(line);
+                const obj = {};
+                headers.forEach((header, index) => {
+                    obj[header] = values[index] || '';
+                });
+                return obj;
+            });
+        }
+
+        function csvLineSplit(line) {
+            const result = [];
+            let current = '';
+            let inQuotes = false;
+            for (let i = 0; i < line.length; i++) {
+                if (line[i] === '"') {
+                    inQuotes = !inQuotes;
+                } else if (line[i] === ',' && !inQuotes) {
+                    result.push(current.trim());
+                    current = '';
+                } else {
+                    current += line[i];
+                }
+            }
+            result.push(current.trim());
+            return result;
+        }
+
+        function showMessage(message, type) {
+            const messageElement = document.getElementById('message');
+            messageElement.textContent = message;
+            messageElement.className = type;
+        }
+
+        function initializeStudyLog() {
+            originalQuizData.forEach(question => {
+                if (!studyLog[question['問題番号']]) {
+                    studyLog[question['問題番号']] = { correct: 0, incorrect: 0 };
+                }
+            });
+        }
+
+        function startQuiz() {
+            if (originalQuizData.length === 0) {
+                showMessage('まずCSVファイルを読み込んでください。', 'error');
+                return;
+            }
+
+            const rangeInput = document.getElementById('range').value;
+            const [start, end] = rangeInput.split('-').map(Number);
+            
+            if (isNaN(start) || isNaN(end) || start > end || start < 1 || end > originalQuizData.length) {
+                showMessage(`正しい範囲を入力してください（1から${originalQuizData.length}まで）`, 'error');
+                return;
+            }
+
+            quizData = originalQuizData.filter(q => {
+                const qNum = parseInt(q['問題番号']);
+                return qNum >= start && qNum <= end;
+            });
+
+            if (quizData.length === 0) {
+                showMessage('指定された範囲に問題がありません。', 'error');
+                return;
+            }
+
+            currentQuestionIndex = 0;
+            correctAnswers = 0;
+            incorrectQuestions = [];
+            isReviewMode = false;
+            document.getElementById('start').style.display = 'none';
+            document.getElementById('quiz').style.display = 'block';
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const question = quizData[currentQuestionIndex];
+            document.getElementById('questionNumber').textContent = question['問題番号'];
+            document.getElementById('questionContainer').textContent = question['問題'];
+            document.getElementById('judgement').textContent = '';
+            document.getElementById('explanationText').textContent = '';
+            hasAnswered = false;  // 問題が表示されたら回答可能にする
+            toggleAnswerButtons(true);  // ボタンを有効化
+        }
+
+        function submitAnswer(answer, buttonElement) {
+            if (hasAnswered) return;  // すでに解答済みなら何もしない
+
+            const question = quizData[currentQuestionIndex];
+            const isCorrect = answer === question['正解'];
+            if (isCorrect) {
+                correctAnswers++;
+                studyLog[question['問題番号']].correct++;
+            } else {
+                if (!isReviewMode) {
+                    incorrectQuestions.push(question);
+                }
+                studyLog[question['問題番号']].incorrect++;
+            }
+
+            hasAnswered = true;  // 解答済みフラグを立てる
+            toggleAnswerButtons(false);  // ボタンを無効化
+            buttonElement.classList.add('selected-answer');  // 選択したボタンを濃い緑色に変更
+
+            document.getElementById('judgement').textContent = isCorrect ? '正解です！' : '不正解です。';
+            document.getElementById('explanationText').textContent = question['解答'];
+        }
+
+        function toggleAnswerButtons(enabled) {
+            document.getElementById('button1').disabled = !enabled;
+            document.getElementById('button2').disabled = !enabled;
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizData.length) {
+                showQuestion();
+                resetButtonStyles();  // ボタンのスタイルをリセット
+            } else {
+                showResult();
+            }
+        }
+
+        function resetButtonStyles() {
+            document.getElementById('button1').classList.remove('selected-answer');
+            document.getElementById('button2').classList.remove('selected-answer');
+        }
+
+        function stopQuiz() {
+            if (confirm('クイズを中止してもよろしいですか？')) {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            document.getElementById('quiz').style.display = 'none';
+            document.getElementById('start').style.display = 'block';
+            
+            if (isReviewMode) {
+                showMessage(`${quizData.length}問中${correctAnswers}問正解しました。復習モードをもう一度実行してください。`, 'success');
+                isReviewMode = false;
+            } else {
+                showMessage(`${currentQuestionIndex}問中${correctAnswers}問正解しました。`, 'success');
+            }
+        }
+
+        function startReviewMode() {
+            quizData = originalQuizData.filter(question => {
+                const log = studyLog[question['問題番号']];
+                return log && log.correct === 0 && log.incorrect > 0;
+            });
+
+            if (quizData.length === 0) {
+                showMessage('正解していない問題はありません。', 'success');
+                return;
+            }
+
+            currentQuestionIndex = 0;
+            correctAnswers = 0;
+            incorrectQuestions = [];
+            isReviewMode = true;
+            document.getElementById('start').style.display = 'none';
+            document.getElementById('quiz').style.display = 'block';
+            showQuestion();
+        }
+
+        function startReviewLowAccuracy() {
+            const sortedQuestions = Object.entries(studyLog)
+                .map(([questionNumber, log]) => {
+                    const total = log.correct + log.incorrect;
+                    const accuracy = total > 0 ? log.correct / total : 0;
+                    return { questionNumber, accuracy };
+                })
+                .sort((a, b) => a.accuracy - b.accuracy)
+                .filter(q => q.accuracy < 1);
+
+            quizData = sortedQuestions.map(q => {
+                return originalQuizData.find(question => question['問題番号'] === q.questionNumber);
+            });
+
+            if (quizData.length === 0) {
+                showMessage('全ての問題が正解率100%です。復習する問題がありません。', 'success');
+                return;
+            }
+
+            currentQuestionIndex = 0;
+            correctAnswers = 0;
+            incorrectQuestions = [];
+            isReviewMode = true;
+            document.getElementById('start').style.display = 'none';
+            document.getElementById('quiz').style.display = 'block';
+            showQuestion();
+        }
+
+        function showStudyResults() {
+            const tableBody = document.querySelector('#resultsTable tbody');
+            tableBody.innerHTML = '';
+
+            for (const [questionNumber, log] of Object.entries(studyLog)) {
+                const total = log.correct + log.incorrect;
+
+                // 無効なデータをスキップするためのチェック
+                if (!questionNumber || isNaN(total)) continue;
+
+                const row = tableBody.insertRow();
+                row.insertCell(0).textContent = questionNumber;
+                row.insertCell(1).textContent = total;
+                row.insertCell(2).textContent = log.correct;
+                row.insertCell(3).textContent = log.incorrect;
+                row.insertCell(4).textContent = total > 0 ? `${(log.correct / total * 100).toFixed(2)}%` : 'N/A';
+            }
+
+            document.getElementById('start').style.display = 'none';
+            document.getElementById('studyResults').style.display = 'block';
+        }
+
+        function returnToStart() {
+            document.getElementById('studyResults').style.display = 'none';
+            document.getElementById('quiz').style.display = 'none';
+            document.getElementById('start').style.display = 'block';
+        }
+
+        function refreshApp() {
+            if (confirm('本当にリフレッシュしますか？学習ログがリセットされます。')) {
+                studyLog = {};
+                originalQuizData = [];
+                quizData = [];
+                currentQuestionIndex = 0;
+                correctAnswers = 0;
+                incorrectQuestions = [];
+                isReviewMode = false;
+                document.getElementById('csvFile').value = '';
+                document.getElementById('range').value = '';
+                showMessage('アプリケーションがリフレッシュされました。', 'success');
+            }
+        }
+
+        function exportStudyLog() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(studyLog));
+            const downloadAnchorNode = document.getElementById('downloadLink');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "study_log.json");
+            downloadAnchorNode.style.display = 'block';
+            downloadAnchorNode.click();
+            downloadAnchorNode.style.display = 'none';
+        }
+
+        function importStudyLog() {
+            const fileInput = document.getElementById('logFile');
+            const file = fileInput.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        studyLog = JSON.parse(e.target.result);
+                        showMessage('学習ログが正常に読み込まれました。', 'success');
+                    } catch ( error) {
+                        showMessage('学習ログの読み込みに失敗しました: ' + error.message, 'error');
+                    }
+                };
+                reader.onerror = function(e) {
+                    showMessage('ファイルの読み込みに失敗しました。', 'error');
+                };
+                reader.readAsText(file);
+            } else {
+                showMessage('ファイルを選択してください。', 'error');
+            }
+        }
+
+        function toggleMobileMode() {
+            const isChecked = document.getElementById('mobileModeToggle').checked;
+            if (isChecked) {
+                document.body.classList.add('mobile-mode');
+                document.querySelector('meta[name="viewport"]').setAttribute('content', 'width=414, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+            } else {
+                document.body.classList.remove('mobile-mode');
+                document.querySelector('meta[name="viewport"]').setAttribute('content', 'width=device-width, initial-scale=1.0');
+            }
+        }
+    </script>
+</body>
+</html>
