@@ -7,17 +7,24 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 0 auto;
-            padding: 20px;
+            margin: 0;
+            padding: 20px 5px;
             line-height: 1.6;
             overflow-x: hidden;
             max-width: 800px;
-            width: 100%;
+            width: calc(100% - 10px);
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         #start, #quiz, #studyResults {
             width: 100%;
             box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         button {
@@ -30,7 +37,9 @@
             border: none;
             border-radius: 5px;
             width: 100%;
+            max-width: 400px;
             box-sizing: border-box;
+            text-align: center;
         }
 
         .stop-button {
@@ -46,6 +55,7 @@
             padding: 10px;
             margin: 10px 0;
             box-sizing: border-box;
+            max-width: 400px;
         }
 
         .content-box {
@@ -55,6 +65,7 @@
             border: 1px solid #ddd;
             border-radius: 5px;
             box-sizing: border-box;
+            width: 100%;
         }
 
         .answer-buttons {
@@ -63,6 +74,8 @@
             gap: 20px;
             margin-top: 20px;
             flex-wrap: wrap;
+            width: 100%;
+            max-width: 400px;
         }
 
         .answer-button {
@@ -70,8 +83,9 @@
             font-size: 18px;
             cursor: pointer;
             flex-grow: 1;
-            max-width: calc(50% - 20px);
+            max-width: calc(50% - 10px);
             box-sizing: border-box;
+            text-align: center;
         }
 
         table {
@@ -94,10 +108,6 @@
         }
 
         @media screen and (max-width: 600px) {
-            body {
-                padding: 10px;
-            }
-
             button {
                 font-size: 14px;
                 padding: 8px 16px;
@@ -122,46 +132,6 @@
                 padding: 10px;
             }
         }
-
-        /* 全体の横幅調整 */
-        #quiz, #studyResults {
-            padding: 10px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        /* スマホモードの設定 */
-        body.mobile-mode {
-            max-width: 414px; /* iPhone 11の幅に固定 */
-            padding: 10px;
-        }
-
-        body.mobile-mode button {
-            font-size: 14px;
-            padding: 8px 16px;
-        }
-
-        body.mobile-mode input[type="text"],
-        body.mobile-mode input[type="file"] {
-            padding: 8px;
-            font-size: 14px;
-        }
-
-        body.mobile-mode .answer-button {
-            font-size: 16px;
-            padding: 8px 16px;
-            max-width: 100%;
-        }
-
-        body.mobile-mode h1, 
-        body.mobile-mode h2, 
-        body.mobile-mode h3 {
-            font-size: 18px;
-        }
-
-        body.mobile-mode .content-box {
-            padding: 10px;
-        }
     </style>
 </head>
 <body>
@@ -175,7 +145,6 @@
         <label for="range">問題範囲（例: 1-11）: </label>
         <input type="text" id="range" placeholder="1-11">
         <br>
-        <label><input type="checkbox" id="mobileModeToggle" onchange="toggleMobileMode()"> スマホモードに切り替える</label>
         <button onclick="startQuiz()">クイズを開始</button>
         <button onclick="showStudyResults()">学習結果</button>
         <button onclick="exportStudyLog()">学習ログを出力</button>
@@ -544,17 +513,6 @@
                 reader.readAsText(file);
             } else {
                 showMessage('ファイルを選択してください。', 'error');
-            }
-        }
-
-        function toggleMobileMode() {
-            const isChecked = document.getElementById('mobileModeToggle').checked;
-            if (isChecked) {
-                document.body.classList.add('mobile-mode');
-                document.querySelector('meta[name="viewport"]').setAttribute('content', 'width=414, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
-            } else {
-                document.body.classList.remove('mobile-mode');
-                document.querySelector('meta[name="viewport"]').setAttribute('content', 'width=device-width, initial-scale=1.0, user-scalable=yes');
             }
         }
     </script>
