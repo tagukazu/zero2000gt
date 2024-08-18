@@ -11,12 +11,21 @@
             padding: 20px 5px;
             line-height: 1.6;
             overflow-x: hidden;
-            max-width: 800px;
-            width: calc(100% - 10px);
-            box-sizing: border-box;
             display: flex;
-            flex-direction: column;
+            justify-content: center;
             align-items: center;
+            min-height: 100vh; /* 縦方向にも中央に配置 */
+            box-sizing: border-box;
+        }
+
+        #container {
+            max-width: 800px;
+            width: 100%;
+            padding: 20px;
+            background-color: #f9f9f9;
+            box-sizing: border-box;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
 
         #start, #quiz, #studyResults {
@@ -135,57 +144,59 @@
     </style>
 </head>
 <body>
-    <h1>クイズ宅建くん</h1>
-    <div id="start">
-        <button onclick="document.getElementById('csvFile').click()">ファイルの選択</button>
-        <input type="file" id="csvFile" accept=".csv" style="display: none;" onchange="updateFileName()">
-        <button onclick="loadCSV()">CSVファイルを読み込む</button>
-        <div id="message"></div>
-        <br>
-        <label for="range">問題範囲（例: 1-11）: </label>
-        <input type="text" id="range" placeholder="1-11">
-        <br>
-        <button onclick="startQuiz()">クイズを開始</button>
-        <button onclick="showStudyResults()">学習結果</button>
-        <button onclick="exportStudyLog()">学習ログを出力</button>
-        <a id="downloadLink" style="display:none;">学習ログをダウンロード</a>
-        <button onclick="document.getElementById('logFile').click()">学習ログを読み込む</button>
-        <input type="file" id="logFile" accept=".json" style="display: none;" onchange="importStudyLog()">
-        <button onclick="startReviewMode()">復習モードを開始</button>
-        <button onclick="startReviewLowAccuracy()">正解率が低い問題を復習</button>
-        <button onclick="refreshApp()">リフレッシュ</button>
-    </div>
-
-    <div id="quiz" style="display:none;">
-        <h2>問題 <span id="questionNumber"></span></h2>
-        <div id="questionContainer" class="content-box"></div>
-        <div class="answer-buttons">
-            <button class="answer-button" id="button1" onclick="submitAnswer('〇', this)">○</button>
-            <button class="answer-button" id="button2" onclick="submitAnswer('×', this)">×</button>
+    <div id="container">
+        <h1>クイズ宅建くん</h1>
+        <div id="start">
+            <button onclick="document.getElementById('csvFile').click()">ファイルの選択</button>
+            <input type="file" id="csvFile" accept=".csv" style="display: none;" onchange="updateFileName()">
+            <button onclick="loadCSV()">CSVファイルを読み込む</button>
+            <div id="message"></div>
+            <br>
+            <label for="range">問題範囲（例: 1-11）: </label>
+            <input type="text" id="range" placeholder="1-11">
+            <br>
+            <button onclick="startQuiz()">クイズを開始</button>
+            <button onclick="showStudyResults()">学習結果</button>
+            <button onclick="exportStudyLog()">学習ログを出力</button>
+            <a id="downloadLink" style="display:none;">学習ログをダウンロード</a>
+            <button onclick="document.getElementById('logFile').click()">学習ログを読み込む</button>
+            <input type="file" id="logFile" accept=".json" style="display: none;" onchange="importStudyLog()">
+            <button onclick="startReviewMode()">復習モードを開始</button>
+            <button onclick="startReviewLowAccuracy()">正解率が低い問題を復習</button>
+            <button onclick="refreshApp()">リフレッシュ</button>
         </div>
-        <div id="judgement"></div>
-        <h3>解説</h3>
-        <div id="explanationText" class="content-box"></div>
-        <button id="nextButton" onclick="nextQuestion()">次の問題へ</button>
-        <button class="stop-button" onclick="stopQuiz()">クイズを中止</button>
-    </div>
 
-    <div id="studyResults" style="display:none;">
-        <button onclick="returnToStart()">最初の画面に戻る</button>
-        <h2>学習結果</h2>
-        <table id="resultsTable">
-            <thead>
-                <tr>
-                    <th>問題番号</th>
-                    <th>解答数</th>
-                    <th>正解数</th>
-                    <th>不正解数</th>
-                    <th>正解率</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
-        <button onclick="returnToStart()">最初の画面に戻る</button>
+        <div id="quiz" style="display:none;">
+            <h2>問題 <span id="questionNumber"></span></h2>
+            <div id="questionContainer" class="content-box"></div>
+            <div class="answer-buttons">
+                <button class="answer-button" id="button1" onclick="submitAnswer('〇', this)">○</button>
+                <button class="answer-button" id="button2" onclick="submitAnswer('×', this)">×</button>
+            </div>
+            <div id="judgement"></div>
+            <h3>解説</h3>
+            <div id="explanationText" class="content-box"></div>
+            <button id="nextButton" onclick="nextQuestion()">次の問題へ</button>
+            <button class="stop-button" onclick="stopQuiz()">クイズを中止</button>
+        </div>
+
+        <div id="studyResults" style="display:none;">
+            <button onclick="returnToStart()">最初の画面に戻る</button>
+            <h2>学習結果</h2>
+            <table id="resultsTable">
+                <thead>
+                    <tr>
+                        <th>問題番号</th>
+                        <th>解答数</th>
+                        <th>正解数</th>
+                        <th>不正解数</th>
+                        <th>正解率</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+            <button onclick="returnToStart()">最初の画面に戻る</button>
+        </div>
     </div>
 
     <script>
