@@ -117,20 +117,25 @@
         }
 
         @media screen and (max-width: 600px) {
+            body {
+                min-width: 400px;
+            }
             button {
                 font-size: 14px;
                 padding: 8px 16px;
+                max-width: 400px;
             }
 
             input[type="text"], input[type="file"] {
                 padding: 8px;
                 font-size: 14px;
+                max-width: 400px;
             }
 
             .answer-button {
                 font-size: 16px;
                 padding: 8px 16px;
-                max-width: 100%;
+                max-width: calc(50% - 10px);
             }
 
             h1, h2, h3 {
@@ -139,6 +144,7 @@
 
             .content-box {
                 padding: 10px;
+                max-width: 400px;
             }
         }
     </style>
